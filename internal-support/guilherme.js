@@ -1,0 +1,25 @@
+module.exports = {
+    name: 'Guilherme',
+    id: 'UFC4KKERL',
+    courses: [
+        'android-sua-primeira-app-mobile ',
+        'http-fundamentos',
+        'pitc',
+        'java8-lambda',
+        'java-primeiros-passo',
+        'java-introducao-orientacao-objet',
+        'java-heranca-interfaces-polimorfismo',
+        'java-excecoe',
+        'java-pacotes-e-java-lang',
+        'java-util-lambda',
+        'java-trabalhando-com-io ',
+        'java-collections',
+        'lean',
+        'linux-ubuntu',
+        'maven-build-do-zero-a-we',
+        'oracle-s',
+        'ruby-on-rails-5 ',
+        'servlets-fundamentos-programacao-web-jav',
+        'introducao-a-uml',
+    ]
+}
