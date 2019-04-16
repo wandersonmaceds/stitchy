@@ -31,7 +31,7 @@ function sendMessage(user, message){
 }
 
 app.get('/', (request, response) => {
-  axios.get(process.env.FORUM_SEM_SOLUCAO_API)
+  axios.get(process.env.FORUM_SEM_RESPOSTAS_API)
   .then(response => response.data.list)
   .then(posts => {
     internalSupport.forEach(user => {
