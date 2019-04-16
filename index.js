@@ -1,13 +1,15 @@
 const revisors = require('./revisors');
 const internalSupport = require('./internal-support');
 const axios = require('axios');
+const express = require('express');
+
+app = express();
 
 require('dotenv').config();
 
+
 const slackAPIToken = process.env.SLACK_TOKEN;
-
-console.log(slackAPIToken);
-
+  
 function buildMessage(user, topics){
   const baseUrl = 'https://cursos.alura.com.br';
   const mappedTopic = topics.map((topic, index) => `Tópico: ${index + 1}\nTempo de espera: ${topic.days} dias\nTítulo: ${topic.title}\nURL: ${baseUrl + topic.link}\n\n`)
@@ -28,24 +30,32 @@ function sendMessage(user, message){
   .catch(error => console.log(error));
 }
 
-axios.get(process.env.FORUM_SEM_SOLUCAO_API)
-     .then(response => response.data.list)
-     .then(posts => {
-       internalSupport.forEach(user => {
-         const internalAlert = []
-         
-        user.courses.forEach(course => {
-          internalAlert.push(...(posts.filter(post => post.courseCode == course)));
-          posts = posts.filter(post => !internalAlert.includes(post))
-          
-          if(internalAlert.length >= 10)
-              return;
-            });
-            
-            if(internalAlert.length){
-              let message = buildMessage(user.name, internalAlert);
-              sendMessage(user.id, message);
-            }
-          });
+app.get('/', (request, response) => {
+  axios.get(process.env.FORUM_SEM_SOLUCAO_API)
+  .then(response => response.data.list)
+  .then(posts => {
+    internalSupport.forEach(user => {
+      const internalAlert = []
+      
+      user.courses.forEach(course => {
+        internalAlert.push(...(posts.filter(post => post.courseCode == course)));
+        posts = posts.filter(post => !internalAlert.includes(post))
+        
+        if(internalAlert.length >= 10)
+        return;
+      });
+      
+      if(internalAlert.length){
+        let message = buildMessage(user.name, internalAlert);
+        sendMessage(user.id, message);
+      }
+    });
+    response.send('enviando tópicos');
   })
-  .catch(error => console.log(error));
+  .catch(error => {
+    console.log(error);
+    response.send('deu ruim!');
+  });
+})
+
+app.listen(process.env.PORT || 4000, () => console.log('running'));
