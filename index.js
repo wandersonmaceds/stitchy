@@ -35,31 +35,35 @@ app.get('/', (request, response) => {
 });
 
 app.get('/report/internal', (request, response) => {
-  axios.get(process.env.FORUM_SEM_RESPOSTAS_API)
-  .then(response => response.data.list)
-  .then(posts => {
-    internalSupport.forEach(user => {
-      const internalAlert = []
-      
-      user.courses.forEach(course => {
-        internalAlert.push(...(posts.filter(post => post.courseCode == course)));
-        posts = posts.filter(post => !internalAlert.includes(post))
+  axios.get(process.env.FORUM_CLEAN_CACHE)
+  .then(response => {
+    axios.get(process.env.FORUM_SEM_RESPOSTAS_API)
+      .then(response => response.data.list)
+      .then(posts => {
+      internalSupport.forEach(user => {
+        const internalAlert = []
         
-        if(internalAlert.length >= 10)
-        return;
+        user.courses.forEach(course => {
+          internalAlert.push(...(posts.filter(post => post.courseCode == course)));
+          posts = posts.filter(post => !internalAlert.includes(post))
+          
+          if(internalAlert.length >= 10)
+          return;
+        });
+        
+        if(internalAlert.length){
+          let message = buildMessage(user.name, internalAlert);
+          sendMessage(user.id, message);
+        }
       });
-      
-      if(internalAlert.length){
-        let message = buildMessage(user.name, internalAlert);
-        sendMessage(user.id, message);
-      }
+      response.send('enviando tópicos');
+    })
+    .catch(error => {
+      console.log(error);
+      response.send('deu ruim!');
     });
-    response.send('enviando tópicos');
   })
-  .catch(error => {
-    console.log(error);
-    response.send('deu ruim!');
-  });
+  .catch(error => console.log(error));
 })
 
 app.listen(process.env.PORT || 4000, () => console.log('running'));
