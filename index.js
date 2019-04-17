@@ -30,7 +30,7 @@ function sendMessage(user, message){
   .catch(error => console.log(error));
 }
 
-app.get('/', (request, response) => {
+app.get('/report/internal', (request, response) => {
   axios.get(process.env.FORUM_SEM_RESPOSTAS_API)
   .then(response => response.data.list)
   .then(posts => {
