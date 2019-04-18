@@ -54,6 +54,7 @@ app.get('/report/internal', (request, response) => {
         if(internalAlert.length){
           let message = buildMessage(user.name, internalAlert);
           sendMessage(user.id, message);
+          sendMessage('CJ0DNN86L', `dúvidas enviadas para ${user.name}`);
         }
       });
       response.send('enviando tópicos');
