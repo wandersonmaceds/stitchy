@@ -5,7 +5,8 @@ class AluraService{
     }
 
     async getNoAnsweredTopics() {
-        const topics = await this._httpClient.get(process.env.FORUM_SEM_RESPOSTAS_API)
-        return topics.list;
+        await this._httpClient.get(process.env.FORUM_CLEAN_CACHE);
+        const response = await this._httpClient.get(process.env.FORUM_SEM_RESPOSTAS_API)
+        return response.data.list;
     }
 }
