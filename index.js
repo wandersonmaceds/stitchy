@@ -34,38 +34,33 @@ app.get('/', (request, response) => {
   response.send('estou vivo beibi!');
 });
 
-app.get('/report/internal', (request, resp) => {
-  axios.get(process.env.FORUM_CLEAN_CACHE)
-  .then(response => {
-    axios.get(process.env.FORUM_SEM_RESPOSTAS_API)
-      .then(response => response.data.list)
-      .then(posts => {
-      internalSupport.forEach(user => {
-        const internalAlert = []
-        
-        user.courses.forEach(course => {
-          internalAlert.push(...(posts.filter(post => post.courseCode == course)));
-          posts = posts.filter(post => !internalAlert.includes(post))
-          
-          if(internalAlert.length >= 10){
-            return;
-          }
-        });
-        
-        if(internalAlert.length){
-          let message = buildMessage(user.name, internalAlert);
-          sendMessage(user.id, message);
-          sendMessage('CJ0DNN86L', `dúvidas enviadas para ${user.name}`);
-        }
-      });
-      resp.send('enviando tópicos');
-    })
-    .catch(error => {
-      console.log(error);
-      response.send('deu ruim!');
+app.get('/report/internal', async (request, response) => {
+  try{
+    await axios.get(process.env.FORUM_CLEAN_CACHE)
+    const apiResponse = await axios.get(process.env.FORUM_SEM_RESPOSTAS_API);
+    let posts = apiResponse.data.list;
+    
+    internalSupport.forEach(({id, name, courses}) => {
+      
+      const postsToSend = courses.reduce((postsToSend, course) => {
+        postsToSend = postsToSend.concat(posts.filter(post => post.courseCode == course))
+        posts = posts.filter(post => !postsToSend.includes(post));
+        return postsToSend;
+      }, []);
+      
+      
+      if(postsToSend.length){
+        const message = buildMessage(name, postsToSend.slice(0, 10));
+        sendMessage(id, message);
+        sendMessage('CJ0DNN86L', `${message}`);
+      }
     });
-  })
-  .catch(error => console.log(error));
-})
+  } catch(e) {
+    console.log(e);    
+  }
+
+  response.send('enviando tópicos');
+
+});
 
 app.listen(process.env.PORT || 4000, () => console.log('running'));
