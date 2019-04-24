@@ -12,7 +12,7 @@ const slackAPIToken = process.env.SLACK_TOKEN;
   
 function buildMessage(user, topics){
   const baseUrl = 'https://cursos.alura.com.br';
-  const mappedTopic = topics.map((topic, index) => `Tópico: ${index + 1}\nTempo de espera: ${topic.days} dias\nTítulo: ${topic.title}\nURL: ${baseUrl + topic.link}\n\n`)
+  const mappedTopic = topics.slice(0, 10).map((topic, index) => `Tópico: ${index + 1}\nTempo de espera: ${topic.days} dias\nTítulo: ${topic.title}\nURL: ${baseUrl + topic.link}\n\n`)
   return `Oi ${user}, separei esses tópicos pra gente ver hoje.\n\n${mappedTopic.join('')}`
 }
 
@@ -34,7 +34,7 @@ app.get('/', (request, response) => {
   response.send('estou vivo beibi!');
 });
 
-app.get('/report/internal', (request, response) => {
+app.get('/report/internal', (request, resp) => {
   axios.get(process.env.FORUM_CLEAN_CACHE)
   .then(response => {
     axios.get(process.env.FORUM_SEM_RESPOSTAS_API)
@@ -47,8 +47,9 @@ app.get('/report/internal', (request, response) => {
           internalAlert.push(...(posts.filter(post => post.courseCode == course)));
           posts = posts.filter(post => !internalAlert.includes(post))
           
-          if(internalAlert.length >= 10)
-          return;
+          if(internalAlert.length >= 10){
+            return;
+          }
         });
         
         if(internalAlert.length){
@@ -57,7 +58,7 @@ app.get('/report/internal', (request, response) => {
           sendMessage('CJ0DNN86L', `dúvidas enviadas para ${user.name}`);
         }
       });
-      response.send('enviando tópicos');
+      resp.send('enviando tópicos');
     })
     .catch(error => {
       console.log(error);
