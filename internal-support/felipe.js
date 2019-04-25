@@ -21,10 +21,11 @@ module.exports = {
         'php-oo-1',
         'php-oo-2',
         'php-pdo-parte-2',
-        'php-avancado-orientacao-objetos',
+        'phpavancadooo',
         'php-orientacao-objetos',
         'sass',
         'pog',
+        'ux-base',
         'web-design-responsivo',
     ]
 }
