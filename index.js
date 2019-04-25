@@ -12,7 +12,7 @@ const slackAPIToken = process.env.SLACK_TOKEN;
   
 function buildMessage(user, topics){
   const baseUrl = 'https://cursos.alura.com.br';
-  const mappedTopic = topics.slice(0, 10).map((topic, index) => `Tópico: ${index + 1}\nTempo de espera: ${topic.days} dias\nTítulo: ${topic.title}\nURL: ${baseUrl + topic.link}\n\n`)
+  const mappedTopic = topics.map((topic, index) => `Tópico: ${index + 1}\nTempo de espera: ${topic.days} dias\nTítulo: ${topic.title}\nURL: ${baseUrl + topic.link}\n\n`)
   return `Oi ${user}, separei esses tópicos pra gente ver hoje.\n\n${mappedTopic.join('')}`
 }
 
@@ -42,17 +42,18 @@ app.get('/report/internal', async (request, response) => {
     
     internalSupport.forEach(({id, name, courses}) => {
       
-      const postsToSend = courses.reduce((postsToSend, course) => {
-        postsToSend = postsToSend.concat(posts.filter(post => post.courseCode == course))
-        posts = posts.filter(post => !postsToSend.includes(post));
-        return postsToSend;
-      }, []);
+      const criteria = post => courses.find(course => course == post.courseCode);
+      const postsToSend = posts.filter(criteria).slice(0, 10);
+    
+      posts = posts.filter(post => !postsToSend.includes(post));
       
       
       if(postsToSend.length){
-        const message = buildMessage(name, postsToSend.slice(0, 10));
+        const message = buildMessage(name, postsToSend);
         sendMessage(id, message);
         sendMessage('CJ0DNN86L', `${message}`);
+      } else {
+        sendMessage(id, `Oi ${name}, não encontrei tópicos para você hoje! :(\nPor favor, dê uma olhada, posso estar enganado: https://cursos.alura.com.br/forum/`)
       }
     });
   } catch(e) {
