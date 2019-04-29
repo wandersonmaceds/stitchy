@@ -2,7 +2,6 @@ const revisors = require('./revisors');
 const internalSupport = require('./internal-support');
 const axios = require('axios');
 const express = require('express');
-const cheerio = require('cheerio');
 const { Client } = require('pg');
 require('dotenv').config();
 
@@ -80,7 +79,6 @@ app.get('/update/courses', async (request, response) => {
   try{
     const apiResponse = await axios.get('https://cursos.alura.com.br/api/cursos');
     const apiCourses = apiResponse.data.map(course => ({ id: course.id, code: course.slug }));
-    await db.query('DELETE FROM users_courses');
     await db.query('DELETE FROM courses');
     const coursesSQL = apiCourses.map(c => `(${c.id},'${c.code}')`).join(', ');
     await db.query(`INSERT INTO courses (id, code) VALUES ${coursesSQL}`);
@@ -89,42 +87,6 @@ app.get('/update/courses', async (request, response) => {
     console.log(e)
     response.send('deu ruim no update dos cursos');
   }
-});
-
-app.get('/update/users-courses', async (request, response) => {
-  try{
-
-    const headers = { headers: { 'Accept' : 'text/html' } };
-    const publicProfileURL = process.env.ALURA_PUBLIC_PROFILE;
-
-    await db.query('DELETE FROM users_courses');
-    
-    const queryData = await db.query('SELECT * FROM users');
-    const users = queryData.rows;
-    
-    const requests = users.map(user => {
-      const profileURL = publicProfileURL + user.alura_handle;
-      return axios.get(profileURL, headers);
-    });
-    
-    const responses = await axios.all(requests);
-    
-    responses.forEach(async userProfileResponse => {
-      const currentUser = users.find(is => userProfileResponse.config.url.includes(is.alura_handle))
-      const $ = cheerio.load(userProfileResponse.data);
-      const coursesCodes = Array.from($('.course-card__course-link')).map(e => `'${e.attribs.href.substr(8)}'`);
-      const coursesIds = await db.query(`SELECT id from courses WHERE code IN (${coursesCodes.join(',')})`);
-      const queryData = coursesIds.rows.map(c => `(${currentUser.id}, ${c.id})`).join(',');
-      const query = `INSERT INTO users_courses(user_id, course_id) VALUES ${queryData}`;
-      // console.log(query, queryData);
-      await db.query(query);
-    });
-
-    response.send('deu bom atualizando os cursos dos moderadores')
-  } catch(e){
-    console.log(e);
-    response.send('deu ruim atualizando os cursos dos moderadores');
-  }
-});
+})
 
 app.listen(process.env.PORT || 4000, () => console.log('running'));
