@@ -2,21 +2,10 @@ const revisors = require('./revisors');
 const internalSupport = require('./internal-support');
 const axios = require('axios');
 const express = require('express');
-const { Client } = require('pg');
-require('dotenv').config();
-
-
-const db = new Client({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT
-});
-db.connect().catch(err => console.log(err));
 
 app = express();
 
+require('dotenv').config();
 
 
 const slackAPIToken = process.env.SLACK_TOKEN;
@@ -74,19 +63,5 @@ app.get('/report/internal', async (request, response) => {
   response.send('enviando tópicos');
 
 });
-
-app.get('/update/courses', async (request, response) => {
-  try{
-    const apiResponse = await axios.get('https://cursos.alura.com.br/api/cursos');
-    const apiCourses = apiResponse.data.map(course => ({ id: course.id, code: course.slug }));
-    await db.query('DELETE FROM courses');
-    const coursesSQL = apiCourses.map(c => `(${c.id},'${c.code}')`).join(', ');
-    await db.query(`INSERT INTO courses (id, code) VALUES ${coursesSQL}`);
-    response.send('updating courses');
-  } catch(e){
-    console.log(e)
-    response.send('deu ruim no update dos cursos');
-  }
-})
 
 app.listen(process.env.PORT || 4000, () => console.log('running'));
