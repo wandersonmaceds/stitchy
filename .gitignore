@@ -1,3 +1,6 @@
 .env
 node_modules/
 testing.js
+data/db
+data/tables.sql
+data/stitch.sql
