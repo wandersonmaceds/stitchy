@@ -65,12 +65,12 @@ app.get('/report/internal', async (request, response) => {
       
       if(postsToSend.length){
         const message = buildMessage(name, postsToSend);
-        sendMessage(id, message);
+        sendMessage(slack_handle, message);
         sendMessage('CJ0DNN86L', `${message}`);
       } else {
         const message = `Oi ${name}, não encontrei tópicos para você hoje! :(\nPor favor, dê uma olhada, posso estar enganado: https://cursos.alura.com.br/forum/`;
         sendMessage('CJ0DNN86L', `${message}`);
-        sendMessage(id, message)
+        sendMessage(slack_handle, message)
       }
     });
   } catch(e) {
