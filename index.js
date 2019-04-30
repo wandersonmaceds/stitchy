@@ -1,11 +1,21 @@
-const revisors = require('./revisors');
-const internalSupport = require('./internal-support');
 const axios = require('axios');
 const express = require('express');
+const cheerio = require('cheerio');
+const { Client } = require('pg');
+require('dotenv').config();
 
 app = express();
 
-require('dotenv').config();
+const db = new Client({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT
+});
+
+db.connect().catch(err => console.log(err));
+
 
 
 const slackAPIToken = process.env.SLACK_TOKEN;
@@ -39,8 +49,19 @@ app.get('/report/internal', async (request, response) => {
     await axios.get(process.env.FORUM_CLEAN_CACHE)
     const apiResponse = await axios.get(process.env.FORUM_SEM_RESPOSTAS_API);
     let posts = apiResponse.data.list;
-    
-    internalSupport.forEach(({id, name, courses}) => {
+    const query = 'SELECT u.id, u.priority_alert, u.slack_handle, u.name, c.code FROM users u, users_courses uc, courses c WHERE uc.user_id = u.id AND uc.course_id = c.id ORDER BY u.priority_alert, u.id'
+    const queryResult = await db.query(query);
+    const users = queryResult.rows.reduce((ac, current) => {
+      const user = ac[current.id] ? ac[current.id] : { id: current.id, slack_handle: current.slack_handle, name: current.name, priority_alert: current.priority_alert, courses: [] };
+      user.courses.push(current.code);
+      ac[current.id] === undefined ? ac[current.id] = user : ac.splice(current.id, 1, user);
+      return ac;
+    }, []);
+
+    users.sort((u1, u2) => u1.priority_alert - u2.priority_alert);
+    // users.forEach(u => console.log(u.id, u.priority_alert, u.name, u.courses.length));
+
+    users.forEach(({slack_handle, name, courses}) => {
       
       const criteria = post => courses.find(course => course == post.courseCode);
       const postsToSend = posts.filter(criteria).slice(0, 10);
@@ -53,7 +74,9 @@ app.get('/report/internal', async (request, response) => {
         sendMessage(id, message);
         sendMessage('CJ0DNN86L', `${message}`);
       } else {
-        sendMessage(id, `Oi ${name}, não encontrei tópicos para você hoje! :(\nPor favor, dê uma olhada, posso estar enganado: https://cursos.alura.com.br/forum/`)
+        const message = `Oi ${name}, não encontrei tópicos para você hoje! :(\nPor favor, dê uma olhada, posso estar enganado: https://cursos.alura.com.br/forum/`;
+        sendMessage('CJ0DNN86L', `${message}`);
+        sendMessage(id, message)
       }
     });
   } catch(e) {
