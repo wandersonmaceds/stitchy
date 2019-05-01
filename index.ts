@@ -20,19 +20,6 @@ function buildMessage(user, topics){
   return `Oi ${user}, separei esses tópicos pra gente ver hoje.\n\n${mappedTopic.join('')}`
 }
 
-function sendMessage(user, message){
-  axios.get('https://slack.com/api/chat.postMessage', {
-    params: {
-      token: slackAPIToken,
-      channel: user,
-      text: message,
-      username: 'Stitch',
-      icon_url: 'https://i.imgur.com/2WOJif0.png'
-    }
-  })
-  .then(response => console.log(response))
-  .catch(error => console.log(error));
-}
 
 app.get('/', (request, response) => {
   response.send('estou vivo beibi!');
