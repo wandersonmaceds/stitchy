@@ -103,7 +103,7 @@ app.get('/update/users-courses', async (request, response) => {
     responses.forEach(async userProfileResponse => {
       const currentUser = users.find(is => userProfileResponse.config.url.includes(is.alura_handle))
       const $ = cheerio.load(userProfileResponse.data);
-      const coursesCodes = Array.from($(`.${process.env.ALURA_COURSE_SELECTOR}`)).map(e => `'${e.attribs.href.substr(8)}'`);
+      const coursesCodes = Array.from($(`.${process.env.ALURA_COURSE_SELECTOR}`)).map((e : CheerioElement) => `'${e.attribs.href.substr(8)}'`);
       const coursesIds = await db.query(`SELECT id from courses WHERE code IN (${coursesCodes.join(',')})`);
       const queryData = coursesIds.rows.map(c => `(${currentUser.id}, ${c.id})`).join(',');
       const query = `INSERT INTO users_courses(user_id, course_id) VALUES ${queryData}`;
