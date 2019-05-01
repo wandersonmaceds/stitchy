@@ -1,7 +1,7 @@
 import { HttpClient } from "../helpers/HttpClient";
 
-class AluraService{
-    
+export class AluraService{
+
     private httpClient: HttpClient;
 
     constructor(httpClient: HttpClient){

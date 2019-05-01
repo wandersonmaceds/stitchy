@@ -1,6 +1,6 @@
 import { HttpClient } from "../helpers/HttpClient";
 
-class SlackService {
+export class SlackService {
     
     private httpClient : HttpClient;
     private slackToken : string;
