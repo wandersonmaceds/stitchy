@@ -1,5 +1,6 @@
 import { HttpClient } from "./helpers/HttpClient";
 import { SlackService } from "./services/SlackService";
+import { MessageBuilder } from "./helpers/MessageBuilder";
 
 const express = require('express');
 const cheerio = require('cheerio');
@@ -19,12 +20,6 @@ db.connect().catch(err => console.log(err));
 
 const slackAPIToken = process.env.SLACK_TOKEN;
   
-function buildMessage(user, topics){
-  const baseUrl = 'https://cursos.alura.com.br';
-  const mappedTopic = topics.map((topic, index) => `Tópico: ${index + 1}\nTempo de espera: ${topic.days} dias\nTítulo: ${topic.title}\nURL: ${baseUrl + topic.link}\n\n`)
-  return `Oi ${user}, separei esses tópicos pra gente ver hoje.\n\n${mappedTopic.join('')}`
-}
-
 
 app.get('/', (request, response) => {
   response.send('estou vivo beibi!');
@@ -56,7 +51,7 @@ app.get('/report/internal', async (request, response) => {
       
       
       if(postsToSend.length){
-        const message = buildMessage(name, postsToSend);
+        const message = MessageBuilder.forTopicsOnSlack(name, postsToSend);
         slackService.sendMessage(slack_handle, message);
         slackService.sendMessage('CJ0DNN86L', `${message}`);
       } else {
