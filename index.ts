@@ -29,24 +29,18 @@ app.get('/report/internal', async (request, response) => {
   try{
     let posts = await aluraService.getNoAnsweredTopics();
     const users = await userDao.getUsersWithCourses();
-    
     users.forEach(({slack_handle, name, courses}) => {
       
       const criteria = post => courses.find(course => course == post.courseCode);
       const postsToSend = posts.filter(criteria).slice(0, 10);
     
       posts = posts.filter(post => !postsToSend.includes(post));
-      
-      
-      if(postsToSend.length){
-        const message = MessageBuilder.forTopicsOnSlack(name, postsToSend);
-        slackService.sendMessage(slack_handle, message);
-        slackService.sendMessage('CJ0DNN86L', `${message}`);
-      } else {
-        const message = `Oi ${name}, não encontrei tópicos para você hoje! :(\nPor favor, dê uma olhada, posso estar enganado: https://cursos.alura.com.br/forum/`;
-        slackService.sendMessage('CJ0DNN86L', `${message}`);
-        slackService.sendMessage(slack_handle, message)
-      }
+            
+      const message = MessageBuilder.forTopicsOnSlack(name, postsToSend);
+      //slackService.sendMessage(slack_handle, message);
+      //slackService.sendMessage('CJ0DNN86L', `${message}`);
+      console.log(message);
+
     });
   } catch(e) {
     console.log(e);    
