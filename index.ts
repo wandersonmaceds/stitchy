@@ -1,6 +1,7 @@
 import { HttpClient } from "./helpers/HttpClient";
 import { SlackService } from "./services/SlackService";
 import { MessageBuilder } from "./helpers/MessageBuilder";
+import { AluraService } from "./services/AluraService";
 
 const express = require('express');
 const cheerio = require('cheerio');
@@ -9,6 +10,7 @@ require('dotenv').config();
 
 const httpClient = new HttpClient();
 const slackService = new SlackService(httpClient);
+const aluraService = new AluraService(httpClient);
 
 const app = express();
 
@@ -27,9 +29,7 @@ app.get('/', (request, response) => {
 
 app.get('/report/internal', async (request, response) => {
   try{
-    await httpClient.get(process.env.FORUM_CLEAN_CACHE)
-    const apiResponse = await httpClient.get(process.env.FORUM_SEM_RESPOSTAS_API);
-    let posts = apiResponse.data.list;
+    let posts = await aluraService.getNoAnsweredTopics();
     const query = 'SELECT u.id, u.priority_alert, u.slack_handle, u.name, c.code FROM users u, users_courses uc, courses c WHERE uc.user_id = u.id AND uc.course_id = c.id ORDER BY u.priority_alert, u.id'
     const queryResult = await db.query(query);
     const users = queryResult.rows.reduce((ac, current) => {
