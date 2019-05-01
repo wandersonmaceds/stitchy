@@ -1,4 +1,4 @@
-import { Topic } from "../dto/Topic";
+import { Topic } from "./../dto/Topic";
 
 export class MessageBuilder{
 

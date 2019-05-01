@@ -3,7 +3,7 @@
         "outDir": "app",
         "moduleResolution": "node",
         "target": "es5",
-        "removeComments": true
+        "removeComments": true,
         // "noImplicitAny": true,
         // "noImplicitReturns": true
     },
