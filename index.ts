@@ -1,8 +1,13 @@
-const axios = require('axios');
+import { HttpClient } from "./helpers/HttpClient";
+import { SlackService } from "./services/SlackService";
+
 const express = require('express');
 const cheerio = require('cheerio');
 const { Client } = require('pg');
 require('dotenv').config();
+
+const httpClient = new HttpClient();
+const slackService = new SlackService(httpClient);
 
 const app = express();
 
@@ -27,8 +32,8 @@ app.get('/', (request, response) => {
 
 app.get('/report/internal', async (request, response) => {
   try{
-    await axios.get(process.env.FORUM_CLEAN_CACHE)
-    const apiResponse = await axios.get(process.env.FORUM_SEM_RESPOSTAS_API);
+    await httpClient.get(process.env.FORUM_CLEAN_CACHE)
+    const apiResponse = await httpClient.get(process.env.FORUM_SEM_RESPOSTAS_API);
     let posts = apiResponse.data.list;
     const query = 'SELECT u.id, u.priority_alert, u.slack_handle, u.name, c.code FROM users u, users_courses uc, courses c WHERE uc.user_id = u.id AND uc.course_id = c.id ORDER BY u.priority_alert, u.id'
     const queryResult = await db.query(query);
@@ -52,12 +57,12 @@ app.get('/report/internal', async (request, response) => {
       
       if(postsToSend.length){
         const message = buildMessage(name, postsToSend);
-        sendMessage(slack_handle, message);
-        sendMessage('CJ0DNN86L', `${message}`);
+        slackService.sendMessage(slack_handle, message);
+        slackService.sendMessage('CJ0DNN86L', `${message}`);
       } else {
         const message = `Oi ${name}, não encontrei tópicos para você hoje! :(\nPor favor, dê uma olhada, posso estar enganado: https://cursos.alura.com.br/forum/`;
-        sendMessage('CJ0DNN86L', `${message}`);
-        sendMessage(slack_handle, message)
+        slackService.sendMessage('CJ0DNN86L', `${message}`);
+        slackService.sendMessage(slack_handle, message)
       }
     });
   } catch(e) {
@@ -69,7 +74,7 @@ app.get('/report/internal', async (request, response) => {
 });
 app.get('/update/courses', async (request, response) => {
   try{
-    const apiResponse = await axios.get(process.env.ALURA_COURSES);
+    const apiResponse = await httpClient.get(process.env.ALURA_COURSES);
     const apiCourses = apiResponse.data.map(course => ({ id: course.id, code: course.slug }));
     await db.query('DELETE FROM users_courses');
     await db.query('DELETE FROM courses');
@@ -95,10 +100,10 @@ app.get('/update/users-courses', async (request, response) => {
     
     const requests = users.map(user => {
       const profileURL = publicProfileURL + user.alura_handle;
-      return axios.get(profileURL, headers);
+      return httpClient.get(profileURL, headers);
     });
     
-    const responses = await axios.all(requests);
+    const responses = await httpClient.all(requests);
     
     responses.forEach(async userProfileResponse => {
       const currentUser = users.find(is => userProfileResponse.config.url.includes(is.alura_handle))
