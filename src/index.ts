@@ -4,6 +4,7 @@ import { MessageBuilder } from "./helpers/MessageBuilder";
 import { AluraService } from "./services/AluraService";
 import { ConnectionFactory } from "./dao/ConnectionFactory";
 import { UserDAO } from "./dao/UserDAO";
+import { TopicFilters } from "./filters/TopicFilters";
 
 const express = require('express');
 const cheerio = require('cheerio');
@@ -26,21 +27,18 @@ app.get('/', (request, response) => {
 });
 
 app.get('/report/internal', async (request, response) => {
+
   try{
     let posts = await aluraService.getNoAnsweredTopics();
     const users = await userDao.getUsersWithCourses();
-    users.forEach(({slack_handle, name, courses}) => {
-      
-      const criteria = post => courses.find(course => course == post.courseCode);
-      const postsToSend = posts.filter(criteria).slice(0, 10);
     
+    users.forEach(user => {
+      const postsToSend = TopicFilters.filterByCoursesCodesAndLimiter(posts, user.courses, 10);
       posts = posts.filter(post => !postsToSend.includes(post));
             
       const message = MessageBuilder.forTopicsOnSlack(name, postsToSend);
-      //slackService.sendMessage(slack_handle, message);
-      //slackService.sendMessage('CJ0DNN86L', `${message}`);
-      console.log(message);
-
+      //slackService.sendMessage(user.slack_handle, message);
+      slackService.sendMessage('CJ0DNN86L', `${message}`);
     });
   } catch(e) {
     console.log(e);    
