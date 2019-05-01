@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 const { Client } = require('pg');
 require('dotenv').config();
 
-app = express();
+const app = express();
 
 const db = new Client({ connectionString: process.env.DATABASE_URL });
 
