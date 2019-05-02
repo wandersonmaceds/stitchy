@@ -3,6 +3,7 @@ require('dotenv').config();
 import { ReportController } from "./controllers/ReportController";
 import { AppController } from "./controllers/AppController";
 import { CourseController } from "./controllers/CourseController";
+import { IndicatorController } from "./controllers/IndicatorController";
 
 const express = require('express');
 const cheerio = require('cheerio');
@@ -11,7 +12,8 @@ const app = express();
 
 app.use('/', new AppController(express.Router()).getRoutes());
 app.use('/report', new ReportController(express.Router()).getRoutes());
-app.use('/courses', new CourseController(express.Router()).getRoutes())
+app.use('/courses', new CourseController(express.Router()).getRoutes());
+app.use('/indicators', new IndicatorController(express.Router()).getRoutes());
 
 // app.get('/update/users-courses', async (request, response) => {
 //   try{
