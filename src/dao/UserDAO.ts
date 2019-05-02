@@ -21,13 +21,16 @@ export class UserDAO{
     }
 
     private transformUsersFromResultQuery(queryResult) : User[] {
-        const users = queryResult.rows.reduce((acc, row) => {
-            const user = acc[row.id] ? acc[row.id] : new User(row.id, row.name, row.priority_alert, row.slack_handle);
+        const users = {};
+        
+        queryResult.rows.forEach(row => {
+            let user = users[row.slack_handle]
+            user = user ? user : new User(row.id, row.name, row.priority_alert, row.slack_handle);    
+            
             user.courses.push(row.code);
-            acc[row.id] ? acc[row.id] = user : acc.splice(row.id, 1, user);
-            return acc;
-        }, []);
+            users[user.slack_handle] = user;
+        });
 
-        return users;
+        return Object.values(users);
     }
 }

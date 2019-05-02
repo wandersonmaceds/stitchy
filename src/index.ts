@@ -1,21 +1,11 @@
-import { HttpClient } from "./helpers/HttpClient";
-import { SlackService } from "./services/SlackService";
-import { MessageBuilder } from "./helpers/MessageBuilder";
-import { AluraService } from "./services/AluraService";
-import { ConnectionFactory } from "./dao/ConnectionFactory";
-import { UserDAO } from "./dao/UserDAO";
-import { TopicFilters } from "./filters/TopicFilters";
+require('dotenv').config();
+
+import { ReportController } from "./controllers/ReportController";
 
 const express = require('express');
 const cheerio = require('cheerio');
 
-require('dotenv').config();
 
-const httpClient = new HttpClient();
-const slackService = new SlackService(httpClient);
-const aluraService = new AluraService(httpClient);
-const connection = new ConnectionFactory().getInstance();
-const userDao = new UserDAO(connection);
 
 const app = express();
 
@@ -26,27 +16,7 @@ app.get('/', (request, response) => {
   response.send('estou vivo beibi!');
 });
 
-app.get('/report/internal', async (request, response) => {
-
-  try{
-    let posts = await aluraService.getNoAnsweredTopics();
-    const users = await userDao.getUsersWithCourses();
-    
-    users.forEach(user => {
-      const postsToSend = TopicFilters.filterByCoursesCodesAndLimiter(posts, user.courses, 10);
-      posts = posts.filter(post => !postsToSend.includes(post));
-            
-      const message = MessageBuilder.forTopicsOnSlack(name, postsToSend);
-      //slackService.sendMessage(user.slack_handle, message);
-      slackService.sendMessage('CJ0DNN86L', `${message}`);
-    });
-  } catch(e) {
-    console.log(e);    
-  }
-
-  response.send('enviando tópicos');
-
-});
+app.use('/report', new ReportController(express.Router()).getRoutes());
 // app.get('/update/courses', async (request, response) => {
 //   try{
 //     const apiResponse = await httpClient.get(process.env.ALURA_COURSES);
