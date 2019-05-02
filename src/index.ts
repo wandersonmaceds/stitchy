@@ -1,22 +1,16 @@
 require('dotenv').config();
 
 import { ReportController } from "./controllers/ReportController";
+import { AppController } from "./controllers/AppController";
 
 const express = require('express');
 const cheerio = require('cheerio');
 
-
-
 const app = express();
 
-const slackAPIToken = process.env.SLACK_TOKEN;
-  
-
-app.get('/', (request, response) => {
-  response.send('estou vivo beibi!');
-});
-
+app.use('/', new AppController(express.Router).getRoutes());
 app.use('/report', new ReportController(express.Router()).getRoutes());
+
 // app.get('/update/courses', async (request, response) => {
 //   try{
 //     const apiResponse = await httpClient.get(process.env.ALURA_COURSES);

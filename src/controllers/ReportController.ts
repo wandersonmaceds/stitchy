@@ -6,8 +6,9 @@ import { UserDAO } from "../dao/UserDAO";
 import { Connection } from "../dao/Connection";
 import { TopicFilters } from "../filters/TopicFilters";
 import { MessageBuilder } from "../helpers/MessageBuilder";
+import { Controller } from "./Controller";
 
-export class ReportController{
+export class ReportController implements Controller{
     
     private router: any;
     private httpClient: HttpClient;
