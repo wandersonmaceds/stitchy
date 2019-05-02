@@ -2,29 +2,16 @@ require('dotenv').config();
 
 import { ReportController } from "./controllers/ReportController";
 import { AppController } from "./controllers/AppController";
+import { CourseController } from "./controllers/CourseController";
 
 const express = require('express');
 const cheerio = require('cheerio');
 
 const app = express();
 
-app.use('/', new AppController(express.Router).getRoutes());
+app.use('/', new AppController(express.Router()).getRoutes());
 app.use('/report', new ReportController(express.Router()).getRoutes());
-
-// app.get('/update/courses', async (request, response) => {
-//   try{
-//     const apiResponse = await httpClient.get(process.env.ALURA_COURSES);
-//     const apiCourses = apiResponse.data.map(course => ({ id: course.id, code: course.slug }));
-//     await db.query('DELETE FROM users_courses');
-//     await db.query('DELETE FROM courses');
-//     const coursesSQL = apiCourses.map(c => `(${c.id},'${c.code}')`).join(', ');
-//     await db.query(`INSERT INTO courses (id, code) VALUES ${coursesSQL}`);
-//     response.send('updating courses');
-//   } catch(e){
-//     console.log(e)
-//     response.send('deu ruim no update dos cursos');
-//   }
-// });
+app.use('/courses', new CourseController(express.Router()).getRoutes())
 
 // app.get('/update/users-courses', async (request, response) => {
 //   try{
