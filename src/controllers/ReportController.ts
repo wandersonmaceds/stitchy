@@ -7,6 +7,7 @@ import { Connection } from "../dao/Connection";
 import { TopicFilters } from "../filters/TopicFilters";
 import { MessageBuilder } from "../helpers/MessageBuilder";
 import { Controller } from "./Controller";
+import * as moment from "moment";
 
 export class ReportController implements Controller{
     
@@ -30,17 +31,24 @@ export class ReportController implements Controller{
 
     async internalSlackAlert(request, response){
         try{
+            const datetime = moment();
+            const day = datetime.get('day');
+            const scheduledTime = `${datetime.get('hours')}:${datetime.get('minutes')}`;
             
-            let posts = await this.aluraService.getNoAnsweredTopics();
-            const users = await this.userDao.getUsersWithCourses();
-            users.forEach(user => {
-                const postsToSend = TopicFilters.filterByCoursesCodesAndLimiter(posts, user.courses, 10);
-                posts = posts.filter(post => !postsToSend.includes(post));
-                const message = MessageBuilder.forTopicsOnSlack(user.name, postsToSend);
-                //slackService.sendMessage(user.slack_handle, message);
-                this.slackService.sendMessage('CJ0DNN86L', `${message}`);
-            });
+            const users = await this.userDao.getUsersWithCoursesByScheduling(day, scheduledTime);
+            
+            if(users.length > 0){
 
+                let posts = await this.aluraService.getNoAnsweredTopics();
+                users.forEach(user => {
+                    const postsToSend = TopicFilters.filterByCoursesCodesAndLimiter(posts, user.courses, 10);
+                    posts = posts.filter(post => !postsToSend.includes(post));
+                    const message = MessageBuilder.forTopicsOnSlack(user.name, postsToSend);
+                    this.slackService.sendMessage(user.slack_handle, message);
+                    this.slackService.sendMessage('CJ0DNN86L', `${message}`);
+                });
+            }
+            
         } catch(e) {
             console.log(e);    
         }
