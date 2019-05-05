@@ -17,6 +17,7 @@ export class UserDAO{
     }
     
     async getUsersWithCoursesByScheduling(day: number, scheduledTime: string) {
+        console.log('posts schedule: ', day, scheduledTime);
         const query = `select u.id, ua.priority, u.slack_handle, u.name, c.code from users_alerts ua, users u, users_courses uc, courses c where ua.user_id = u.id and uc.course_id = c.id and uc.user_id = u.id and ${day} = any (ua.weekdays) and '${scheduledTime}' = any(ua.hours_of_day) and 'topic' = any(ua.type) ORDER BY ua.priority, u.id`;
         const queryResult = await this.connection.query(query);
         const users = this.transformUsersFromResultQuery(queryResult);
