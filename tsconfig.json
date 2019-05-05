@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "app",
+        "outDir": "dist",
         "moduleResolution": "node",
         "target": "es5",
         "removeComments": true,

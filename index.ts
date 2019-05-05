@@ -1,9 +1,9 @@
 require('dotenv').config();
 
-import { ReportController } from "./controllers/ReportController";
-import { AppController } from "./controllers/AppController";
-import { CourseController } from "./controllers/CourseController";
-import { IndicatorController } from "./controllers/IndicatorController";
+import { ReportController } from "./src/controllers/ReportController";
+import { AppController } from "./src/controllers/AppController";
+import { CourseController } from "./src/controllers/CourseController";
+import { IndicatorController } from "./src/controllers/IndicatorController";
 
 const express = require('express');
 const cheerio = require('cheerio');

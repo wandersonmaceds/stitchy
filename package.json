@@ -1,5 +1,5 @@
 {
-  "name": "Stitch",
+  "name": "stitch",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,8 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app/index.js",
-    "build": "tsc .",
+    "start": "node dist",
+    "build": "tsc --outDir dist",
     "dev:watch": "tsc -w"
   },
   "keywords": [],
