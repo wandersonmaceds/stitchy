@@ -36,13 +36,14 @@ export class ReportController implements Controller{
             const hour = datetime.get('hours');
             const minutes = request.query.midHour == 'true' ? '30' : '00';
             const scheduledTime = `${hour}:${minutes}`;
-            
+
             const users = await this.userDao.getUsersWithCoursesByScheduling(day, scheduledTime);
+
             if(users.length > 0){
 
                 let posts = await this.aluraService.getNoAnsweredTopics();
                 users.forEach(user => {
-                    const postsToSend = TopicFilters.filterByCoursesCodesAndLimiter(posts, user.courses, 10);
+                    const postsToSend = TopicFilters.filterByCoursesCodesAndLimiter(posts, user.courses, user.limit_items);
                     posts = posts.filter(post => !postsToSend.includes(post));
                     const message = MessageBuilder.forTopicsOnSlack(user.name, postsToSend);
                     this.slackService.sendMessage(user.slack_handle, message);
