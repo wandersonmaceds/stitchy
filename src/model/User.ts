@@ -1,9 +1,10 @@
 export class User{
     readonly id: number;
     readonly slack_handle: string;
+    alura_handle: string;
     readonly name: string;
     readonly priority_alert: number;
-    readonly courses: [];
+    readonly courses: any[];
     readonly limit_items: number;
 
     constructor(id: number, name: string, priority_alert: number, slack_handle: string = '', courses: [] = [], limit_items = 10){

@@ -5,7 +5,7 @@ export class HttpClient{
         return axios.get(path, config);
     }
 
-    all(requests: []) : Promise<any[]>{
+    all(requests: any[]) : Promise<any[]>{
         return axios.all(requests);
     }
 }

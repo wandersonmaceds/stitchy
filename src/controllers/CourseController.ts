@@ -12,7 +12,7 @@ export class CourseController implements Controller{
 
     constructor(router){
         this.router = router;
-        this.router.get('/update/datastore', this.updateFromApi.bind(this));
+        this.router.get('/update-from-api', this.updateFromApi.bind(this));
         this.aluraService = new AluraService(new HttpClient());
         this.courseDao = new CourseDAO(new ConnectionFactory().getInstance());
     }

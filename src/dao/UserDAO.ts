@@ -2,14 +2,21 @@ import { Connection } from "./Connection";
 import { User } from "../model/User";
 
 export class UserDAO{
+    
     private connection: Connection;
     
     constructor(connection: Connection){
         this.connection = connection;
     }
     
+    async getUsersWithAutoUpdateCourseList() {
+        const query = 'SELECT * FROM users WHERE update_courses_strategy = 1';
+        const queryResult = await this.connection.query(query);
+        return this.transformUsersFromResultQuery(queryResult);
+    }
+
     async getUsersWithCourses(){
-        const query = 'SELECT u.id, u.priority_alert, u.slack_handle, u.name, c.code FROM users u, users_courses uc, courses c WHERE uc.user_id = u.id AND uc.course_id = c.id ORDER BY u.priority_alert, u.id';
+        const query = 'SELECT u.id, ua.priority_alert, u.slack_handle, u.name, c.code FROM users u, users_courses uc, users_alerts ua, courses c WHERE uc.user_id = u.id AND uc.course_id = c.id ORDER BY ua.priority_alert, u.id';
         const queryResult = await this.connection.query(query);
         const users = this.transformUsersFromResultQuery(queryResult);
         
@@ -46,7 +53,7 @@ export class UserDAO{
         queryResult.rows.forEach(row => {
             let user = users[row.slack_handle]
             user = user ? user : new User(row.id, row.name, row.priority, row.slack_handle, [], row.limit_items);    
-            
+            user.alura_handle = row.alura_handle;
             user.courses.push(row.code);
             users[user.slack_handle] = user;
         });

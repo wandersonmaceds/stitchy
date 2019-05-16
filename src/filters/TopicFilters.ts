@@ -10,7 +10,7 @@ export class TopicFilters{
         return topics.slice(0, limiter);
     }
 
-    static filterByCoursesCodesAndLimiter(topics: Topic[], coursesCodes: [], limiter: number){
+    static filterByCoursesCodesAndLimiter(topics: Topic[], coursesCodes: any[], limiter: number){
         const topicsFiltered = [];
         coursesCodes.forEach(courseCode => topicsFiltered.push(...this.filterByCourseCode(topics, courseCode)));
         return this.filterByLimiter(topicsFiltered, limiter);

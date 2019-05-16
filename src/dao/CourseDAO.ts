@@ -9,8 +9,12 @@ export class CourseDAO{
         this.connection = connection;
     }
     
-    updateAll(courses: Course[]) {
-        //todo: get courses from the API, compare with the local, active and desactive locally. 
+    async updateAll(courses: Course[]) {
+        const ids = await this.connection.query('SELECT id FROM courses');
+        const nonLocalCourse = courses.filter(c => !ids.rows.find(row => c.id == row.id));
+        const queryData = nonLocalCourse.map(course => `(${course.id}, '${course.code}')`).join(',');
+        const query = `INSERT INTO courses (id, code) VALUES ${queryData}`;
+        await this.connection.query(query)
     }
 
 }
