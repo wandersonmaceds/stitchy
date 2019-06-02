@@ -1,0 +1,23 @@
+version: "3"
+services:
+  node:
+    image: node:10
+    working_dir: /var/www
+    command: "npm run dev:env"
+    volumes:
+      - "./:/var/www"
+    ports:
+      - 4000:4000
+      - 5000:5000
+  pg:
+    image: postgres:9
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=stitch
+      - POSTGRES_USER=stitch
+      - POSTGRES_DB=stitch
+    volumes:
+      - "./:/var/data"
+    depends_on: 
+      - node

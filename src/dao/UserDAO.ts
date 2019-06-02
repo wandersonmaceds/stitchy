@@ -33,7 +33,7 @@ export class UserDAO{
     }
 
     async saveIndicator(user_id: number, indicator: any){
-        const query = `INSERT INTO users_indicators (user_id, total_posts, date_posts) values (${user_id}, ${indicator.posts}, '${indicator.date}')`;
+        const query = `INSERT INTO users_indicators (user_id, posts, date) values (${user_id}, ${indicator.posts}, '${indicator.date}')`;
         return await this.connection.query(query);
     }
     

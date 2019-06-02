@@ -4,6 +4,7 @@
         "moduleResolution": "node",
         "target": "es5",
         "removeComments": true,
+        "sourceMap": true
         // "noImplicitAny": true,
         // "noImplicitReturns": true
     },

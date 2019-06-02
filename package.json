@@ -10,7 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist",
     "build": "tsc --outDir dist",
-    "dev:watch": "tsc -w"
+    "dev-watch": "tsc -w",
+    "dev-start": "nodemon dist",
+    "dev:env": "concurrently npm:dev-watch npm:dev-start"
   },
   "keywords": [],
   "author": "",
@@ -29,7 +31,9 @@
     "@types/cheerio": "^0.22.11",
     "@types/moment": "^2.13.0",
     "@types/pg": "^7.4.14",
+    "concurrently": "^4.1.0",
     "jest": "^24.7.1",
+    "nodemon": "^1.19.1",
     "ts-jest": "^24.0.2",
     "typescript": "^3.4.4"
   }
