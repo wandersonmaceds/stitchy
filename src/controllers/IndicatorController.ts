@@ -5,11 +5,13 @@ import { UserDAO } from "../dao/UserDAO";
 import { Connection } from "../dao/Connection";
 import { ConnectionFactory } from "../dao/ConnectionFactory";
 import * as moment from "moment-timezone";
+import { SlackService } from "../services/SlackService";
 
 export class IndicatorController implements Controller{
     private router;
     private indicatorService: IndicatorService;
     private userDao: UserDAO;
+    private slackService: SlackService;
 
     constructor(router){
         this.router = router;
@@ -17,6 +19,7 @@ export class IndicatorController implements Controller{
         this.router.get('/update/lastday', this.updateFromAPILastDay.bind(this));
         this.indicatorService = new IndicatorService(new HttpClient());
         this.userDao = new UserDAO(new ConnectionFactory().getInstance());
+        this.slackService = new SlackService(new HttpClient());
     }
 
     async updateFromAPI(request, response){
@@ -48,7 +51,10 @@ export class IndicatorController implements Controller{
         
         users.rows.forEach(user => {
            const ui : any = usersIndicators.find((ui: any) => ui.username == user.alura_handle);
-            ui.indicators.forEach(i => this.userDao.saveIndicator(user.id, i) );
+            ui.indicators.forEach(i => {
+                this.userDao.saveIndicator(user.id, i);
+                this.slackService.sendMessage('CJ0DNN86L', `${user.name} fez ${i.posts} em ${i.date}`);
+            } );
         });
         
         response.send('atualizando indicadores');
