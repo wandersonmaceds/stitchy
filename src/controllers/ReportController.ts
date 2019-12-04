@@ -31,7 +31,7 @@ export class ReportController implements Controller{
 
     async internalSlackAlert(request, response){
         try{
-            const datetime = moment().tz('America/Sao_Paulo');
+            const datetime = moment().tz('America/Fortaleza');
             const day = datetime.get('day');
             const hour = datetime.get('hours');
             const minutes = request.query.midHour == 'true' ? '30' : '00';
