@@ -1,37 +1,32 @@
-import { Connection } from "./Connection";
-import { User } from "../model/User";
-import { Course } from "../dto/Course";
+import { Connection } from './Connection';
+import { User } from '../model/User';
+import { Course } from '../dto/Course';
 
-export class UserCourseDAO{
-    private connection: Connection;
-    
-    constructor(connection: Connection){
-        this.connection = connection;
-    }
-    
-    private deleteCoursesFromUser(userId: number){
-        const query = `DELETE FROM users_courses WHERE user_id = ${userId}`;
-        this.connection.query(query);   
-    }
-    
-    private addCoursesToUser(userIds: number[], courses: Course[]){
-        const query = `INSERT INTO users_courses (user_id, course_id)`;
-        this.connection.query(query);   
-    }
-    
-    async deleteCoursesFromUsers(users: User[]){
-        users.forEach(u => this.deleteCoursesFromUser(u.id));
-    }
-    
-    async addCoursesToUsers(usersCoursesFromProfiles: User[]) {
-        usersCoursesFromProfiles.forEach(async user => {
-            const queryIds = `SELECT id from courses WHERE code IN (${user.courses.join(',')})`;
-            const coursesIds = await this.connection.query(queryIds);
-            
-            const userIdCourseIdQueryData = coursesIds.rows.map(c => `(${user.id}, ${c.id})`).join(',');
-            const queryUserCoursesIds = `INSERT INTO users_courses(user_id, course_id) VALUES ${userIdCourseIdQueryData}`;
-            await this.connection.query(queryUserCoursesIds);
-        });
-    }
-    
+export class UserCourseDAO {
+  private connection: Connection;
+
+  constructor(connection: Connection) {
+    this.connection = connection;
+  }
+
+  async addCoursesToUsers(usersCoursesFromProfiles: User[]) {
+    usersCoursesFromProfiles.forEach(async user => {
+      const ids = user.courses.join(',');
+      const queryIds = `SELECT id from courses WHERE code IN (${ids})`;
+      const coursesIds = await this.connection.query(queryIds);
+
+      const queryUserCoursesIds = `SELECT course_id from users_courses WHERE user_id = ${user.id}`;
+      const userCoursesIds = await this.connection.query(queryUserCoursesIds);
+
+      const diffIds = coursesIds.rows.filter(
+        c => !userCoursesIds.rows.includes(uci => uci.id == c.id)
+      );
+
+      const userIdCourseIdQueryData = diffIds
+        .map(c => `(${user.id}, ${c.id})`)
+        .join(',');
+      const updateCoursesIdsQuery = `INSERT INTO users_courses(user_id, course_id) VALUES ${userIdCourseIdQueryData}`;
+      await this.connection.query(updateCoursesIdsQuery);
+    });
+  }
 }
