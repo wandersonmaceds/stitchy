@@ -22,7 +22,6 @@ export class SlackService {
                 icon_url: process.env.APP_ICON_URL
             }
         })
-        .then(() => {})
         .catch(error => console.error('Error while sending message to slack: ', error));
     }
     

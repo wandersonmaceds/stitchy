@@ -9,7 +9,7 @@ export class ConnectionFactory{
 
     getInstance() : Connection{
         const connection = new Connection( this.connectionString );
-        connection.connect(() => {});
+        connection.connect();
         return connection;
     }
 }

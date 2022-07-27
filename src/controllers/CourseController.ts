@@ -17,7 +17,7 @@ export class CourseController implements Controller{
         this.courseDao = new CourseDAO(new ConnectionFactory().getInstance());
     }
 
-    async updateFromApi(request, response){
+    async updateFromApi(_request, response){
         try{
             const courses = await this.aluraService.getCourses();
             await this.courseDao.updateAll(courses);

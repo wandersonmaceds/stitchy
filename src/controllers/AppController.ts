@@ -8,7 +8,7 @@ export class AppController implements Controller{
         this.router.get('/', this.home.bind(this));
     }
 
-    home(request, response){
+    home(_request, response){
         response.send('App running!');
     }
     

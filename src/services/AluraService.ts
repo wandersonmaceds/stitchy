@@ -20,8 +20,7 @@ export class AluraService{
     
     async getCourses() : Promise<Course[]> {
         const apiResponse = await this.httpClient.get(process.env.ALURA_COURSES);
-        const apiCourses = apiResponse.data.map(course => ({ id: course.id, code: course.slug }));
-        return apiCourses;
+        return apiResponse.data.map(course => ({ id: course.id, code: course.slug }));
     }
 
     async getCoursesFromProfiles(users: User[]) {
@@ -33,17 +32,14 @@ export class AluraService{
         const requests = users.map(user => this.httpClient.get(publicProfileURL + user.alura_handle, headers));
         const responses = await this.httpClient.all(requests);
 
-        const userCoursesCodes = responses.map(userProfileResponse => {
+        return responses.map(userProfileResponse => {
             const currentUser = users.find(is => userProfileResponse.config.url.includes(is.alura_handle))
             const $ = cheerio.load(userProfileResponse.data);
-            const coursesCodes = Array.from($(userCoursesSelector)).map((e : CheerioElement) => `'${e.attribs.href.substr(8)}'`);
+            const coursesCodes = Array.from($(userCoursesSelector)).map((e: any) => `'${e.attribs.href.substr(8)}'`);
             currentUser.courses.splice(0)
             currentUser.courses.push(...coursesCodes);
 
             return currentUser;
         });
-
-       return userCoursesCodes;
-
     }
 }

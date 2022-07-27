@@ -2,7 +2,6 @@ import { Controller } from "./Controller";
 import { IndicatorService } from "../services/IndicatorService";
 import { HttpClient } from "../helpers/HttpClient";
 import { UserDAO } from "../dao/UserDAO";
-import { Connection } from "../dao/Connection";
 import { ConnectionFactory } from "../dao/ConnectionFactory";
 import * as moment from "moment-timezone";
 import { SlackService } from "../services/SlackService";
@@ -22,20 +21,19 @@ export class IndicatorController implements Controller{
         this.slackService = new SlackService(new HttpClient());
     }
 
-    async updateFromAPI(request, response){
+    async updateFromAPI(_request, response){
         const usersIndicators = await this.indicatorService.getAll();
         const usernames = usersIndicators.map((u: any) => u.username);
         const users = await this.userDao.findByUsernames(usernames);
         users.rows.forEach(user => {
-            const ui : any = usersIndicators.find((ui: any) => ui.username == user.alura_handle);
-            console.log(ui);
+            const ui: any = usersIndicators.find((uii: any) => uii.username == user.alura_handle);
             ui.indicators.forEach(i => this.userDao.saveIndicator(user.id, i) );
         });
         
         response.send('atualizando indicadores');
     }
 
-    async updateFromAPILastDay(request, response){
+    async updateFromAPILastDay(_request, response){
         
         const lastDay = moment().tz('America/Sao_Paulo').subtract(1, 'days').format('YYYY-MM-DD');
         const usersAllIndicators = await this.indicatorService.getAll();
@@ -50,7 +48,7 @@ export class IndicatorController implements Controller{
         const users = await this.userDao.findByUsernames(usernames);
         
         users.rows.forEach(user => {
-           const ui : any = usersIndicators.find((ui: any) => ui.username == user.alura_handle);
+           const ui : any = usersIndicators.find((uii: any) => uii.username == user.alura_handle);
             ui.indicators.forEach(i => {
                 this.userDao.saveIndicator(user.id, i);
                 this.slackService.sendMessage('CJ0DNN86L', `${user.name} fez ${i.posts} em ${i.date}`);

@@ -1,6 +1,5 @@
 import { Connection } from './Connection';
 import { User } from '../model/User';
-import { Course } from '../dto/Course';
 
 export class UserCourseDAO {
   private connection: Connection;

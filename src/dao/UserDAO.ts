@@ -34,13 +34,13 @@ export class UserDAO {
 
   async saveIndicator(user_id: number, indicator: any) {
     const query = `INSERT INTO users_indicators (user_id, posts, date) values (${user_id}, ${indicator.posts}, '${indicator.date}')`;
-    return await this.connection.query(query);
+    return this.connection.query(query);
   }
 
   async findByUsernames(usernames: any[]) {
     const queryData = usernames.map(uname => `'${uname}'`).join(',');
     const query = `SELECT * FROM users WHERE alura_handle IN (${queryData})`;
-    return await this.connection.query(query);
+    return this.connection.query(query);
   }
 
   private sortByPriorityAlert(users: User[]): User[] {

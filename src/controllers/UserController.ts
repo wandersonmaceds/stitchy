@@ -4,7 +4,6 @@ import { ConnectionFactory } from '../dao/ConnectionFactory';
 import { AluraService } from '../services/AluraService';
 import { HttpClient } from '../helpers/HttpClient';
 import { UserCourseDAO } from '../dao/UserCourseDAO';
-import { Connection } from '../dao/Connection';
 import { SlackService } from '../services/SlackService';
 
 export class UserController implements Controller {
@@ -28,7 +27,7 @@ export class UserController implements Controller {
     this.slackService = new SlackService(new HttpClient());
   }
 
-  async updateUsersCourses(request, response) {
+  async updateUsersCourses(_request, response) {
     try {
       const users = await this.userDao.getUsersWithAutoUpdateCourseList();
       const usersCoursesFromProfiles = await this.aluraService.getCoursesFromProfiles(
