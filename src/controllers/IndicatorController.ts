@@ -5,15 +5,16 @@ import { UserDAO } from "../dao/UserDAO";
 import { ConnectionFactory } from "../dao/ConnectionFactory";
 import * as moment from "moment-timezone";
 import { SlackService } from "../services/SlackService";
+import { Request, Response } from "express";
 
-export class IndicatorController implements Controller{
-    private router;
+export class IndicatorController extends Controller{
+
     private indicatorService: IndicatorService;
     private userDao: UserDAO;
     private slackService: SlackService;
 
-    constructor(router){
-        this.router = router;
+    constructor() {
+        super('/indicators');
         this.router.get('/update/all', this.updateFromAPI.bind(this));
         this.router.get('/update/lastday', this.updateFromAPILastDay.bind(this));
         this.indicatorService = new IndicatorService(new HttpClient());
@@ -21,7 +22,7 @@ export class IndicatorController implements Controller{
         this.slackService = new SlackService(new HttpClient());
     }
 
-    async updateFromAPI(_request, response){
+    async updateFromAPI(_request: Request, response: Response){
         const usersIndicators = await this.indicatorService.getAll();
         const usernames = usersIndicators.map((u: any) => u.username);
         const users = await this.userDao.findByUsernames(usernames);
@@ -30,10 +31,10 @@ export class IndicatorController implements Controller{
             ui.indicators.forEach(i => this.userDao.saveIndicator(user.id, i) );
         });
         
-        response.send('atualizando indicadores');
+        return response.send('atualizando indicadores');
     }
 
-    async updateFromAPILastDay(_request, response){
+    async updateFromAPILastDay(_request: Request, response: Response){
         
         const lastDay = moment().tz('America/Sao_Paulo').subtract(1, 'days').format('YYYY-MM-DD');
         const usersAllIndicators = await this.indicatorService.getAll();
@@ -58,7 +59,4 @@ export class IndicatorController implements Controller{
         response.send('atualizando indicadores');
     }
 
-    getRoutes() {
-        return this.router;
-    }
 }

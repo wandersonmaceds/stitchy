@@ -8,17 +8,18 @@ import { TopicFilters } from '../filters/TopicFilters';
 import { MessageBuilder } from '../helpers/MessageBuilder';
 import { Controller } from './Controller';
 import * as moment from 'moment-timezone';
+import { Request, Response } from 'express';
 
-export class ReportController implements Controller {
-  private router: any;
+export class ReportController extends Controller {
+  
   private httpClient: HttpClient;
   private slackService: SlackService;
   private aluraService: AluraService;
   private connection: Connection;
   private userDao: UserDAO;
 
-  constructor(router) {
-    this.router = router;
+  constructor() {
+    super('/report'); 
     this.httpClient = new HttpClient();
     this.slackService = new SlackService(this.httpClient);
     this.aluraService = new AluraService(this.httpClient);
@@ -28,7 +29,7 @@ export class ReportController implements Controller {
     this.router.get('/internal', this.internalSlackAlert.bind(this));
   }
 
-  async internalSlackAlert(request, response) {
+  async internalSlackAlert(request: Request, response: Response) {
     try {
       const datetime = moment().tz('America/Fortaleza');
       const day = datetime.get('day');
@@ -66,10 +67,6 @@ export class ReportController implements Controller {
       console.log(e);
     }
 
-    response.send('enviando tópicos');
-  }
-
-  getRoutes() {
-    return this.router;
+    return response.send('enviando tópicos');
   }
 }

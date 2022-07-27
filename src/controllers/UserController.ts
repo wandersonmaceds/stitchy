@@ -5,16 +5,16 @@ import { AluraService } from '../services/AluraService';
 import { HttpClient } from '../helpers/HttpClient';
 import { UserCourseDAO } from '../dao/UserCourseDAO';
 import { SlackService } from '../services/SlackService';
+import { Request, Response } from 'express';
 
-export class UserController implements Controller {
-  private router;
+export class UserController extends Controller {
   private userDao: UserDAO;
   private aluraService: AluraService;
   private userCoursesDao: UserCourseDAO;
   private slackService: SlackService;
 
-  constructor(router) {
-    this.router = router;
+  constructor() {
+    super('/user');
     this.router.get(
       '/update-users-courses',
       this.updateUsersCourses.bind(this)
@@ -27,7 +27,7 @@ export class UserController implements Controller {
     this.slackService = new SlackService(new HttpClient());
   }
 
-  async updateUsersCourses(_request, response) {
+  async updateUsersCourses(_request: Request, response: Response) {
     try {
       const users = await this.userDao.getUsersWithAutoUpdateCourseList();
       const usersCoursesFromProfiles = await this.aluraService.getCoursesFromProfiles(
@@ -48,9 +48,5 @@ export class UserController implements Controller {
       );
       response.send('deu ruim atualizando os cursos dos moderadores');
     }
-  }
-
-  getRoutes() {
-    return this.router;
   }
 }

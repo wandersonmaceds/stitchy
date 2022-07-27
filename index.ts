@@ -5,14 +5,21 @@ import { AppController } from "./src/controllers/AppController";
 import { CourseController } from "./src/controllers/CourseController";
 import { IndicatorController } from "./src/controllers/IndicatorController";
 import { UserController } from "./src/controllers/UserController";
+import { Controller } from "./src/controllers/Controller";
 
 const express = require('express');
 const app = express();
 
-app.use('/', new AppController(express.Router()).getRoutes());
-app.use('/user', new UserController(express.Router()).getRoutes())
-app.use('/report', new ReportController(express.Router()).getRoutes());
-app.use('/course', new CourseController(express.Router()).getRoutes());
-app.use('/indicators', new IndicatorController(express.Router()).getRoutes());
+const controllers: Controller[] = [
+    new AppController,
+    new UserController,
+    new CourseController,
+    new ReportController,
+    new IndicatorController,
+];
+
+controllers.forEach(controller => {
+    app.use(controller.getBasePath(), controller.getRouter)
+})
 
 app.listen(process.env.PORT || 4000, () => console.log('running'));
