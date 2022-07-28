@@ -3,8 +3,9 @@ import { IndicatorService } from "../services/IndicatorService";
 import { HttpClient } from "../helpers/HttpClient";
 import { UserDAO } from "../dao/UserDAO";
 import { ConnectionFactory } from "../dao/ConnectionFactory";
-import * as moment from "moment-timezone";
 import { SlackService } from "../services/SlackService";
+import { zonedTimeToUtc } from "date-fns-tz";
+import { format, sub } from "date-fns";
 
 export class IndicatorController implements Controller{
     private router;
@@ -35,7 +36,7 @@ export class IndicatorController implements Controller{
 
     async updateFromAPILastDay(_request, response){
         
-        const lastDay = moment().tz('America/Sao_Paulo').subtract(1, 'days').format('YYYY-MM-DD');
+        const lastDay = format(sub(zonedTimeToUtc(new Date().toUTCString(), 'America/Sao_Paulo'), { days: 1}), 'YYYY-MM-DD');
         const usersAllIndicators = await this.indicatorService.getAll();
         const usersIndicators = usersAllIndicators.map((u: any) => {
             const lastDayIndicators = u.indicators.filter(i => i.date == lastDay)
