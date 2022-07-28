@@ -1,18 +1,14 @@
+import { Request, Response } from "express";
 import { Controller } from "./Controller";
 
-export class AppController implements Controller{
-    private router : any;
-    
-    constructor(router: any){
-        this.router = router;
+export class AppController extends Controller{
+
+    constructor() {
+        super('/');
         this.router.get('/', this.home.bind(this));
     }
 
-    home(_request, response){
-        response.send('App running!');
-    }
-    
-    getRoutes() {
-        return this.router;
+    home(_request: Request, response: Response) {
+        return response.send('App running!');
     }
 }
