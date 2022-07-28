@@ -1,4 +1,5 @@
-require('dotenv').config();
+import 'dotenv/config';
+import * as express from 'express';
 
 import { ReportController } from "./src/controllers/ReportController";
 import { AppController } from "./src/controllers/AppController";
@@ -6,7 +7,6 @@ import { CourseController } from "./src/controllers/CourseController";
 import { IndicatorController } from "./src/controllers/IndicatorController";
 import { UserController } from "./src/controllers/UserController";
 
-const express = require('express');
 const app = express();
 
 app.use('/', new AppController(express.Router()).getRoutes());
