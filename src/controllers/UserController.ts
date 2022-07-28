@@ -19,10 +19,10 @@ export class UserController implements Controller {
       '/update-users-courses',
       this.updateUsersCourses.bind(this)
     );
-    this.userDao = new UserDAO(new ConnectionFactory().getInstance());
-    this.userCoursesDao = new UserCourseDAO(
-      new ConnectionFactory().getInstance()
-    );
+
+    const connectionFactory = new ConnectionFactory();
+    this.userDao = new UserDAO(connectionFactory.getInstance());
+    this.userCoursesDao = new UserCourseDAO(connectionFactory.getInstance());
     this.aluraService = new AluraService(new HttpClient());
     this.slackService = new SlackService(new HttpClient());
   }
