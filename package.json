@@ -7,6 +7,7 @@
     "node": "18.x"
   },
   "scripts": {
+    "prepare": "husky install",
     "test": "jest",
     "start": "node dist",
     "lint": "eslint .",
@@ -39,7 +40,9 @@
     "@typescript-eslint/parser": "^5.31.0",
     "concurrently": "^7.3.0",
     "eslint": "^8.20.0",
+    "husky": "^8.0.1",
     "jest": "^28.1.3",
+    "lint-staged": "^13.0.3",
     "nodemon": "^2.0.19",
     "ts-jest": "^28.0.7",
     "typescript": "^4.7.4",
