@@ -4,9 +4,9 @@
         "moduleResolution": "node",
         "target": "es5",
         "removeComments": true,
-        "sourceMap": true
-        // "noImplicitAny": true,
-        // "noImplicitReturns": true
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true
     },
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "test"]
 }
